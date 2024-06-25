@@ -1,3 +1,3 @@
-export default function Login() {
-  return <h1>login</h1>;
+export default function CreateAccount() {
+  return <h1>create account</h1>;
 }
