@@ -1,83 +1,61 @@
-import styled from 'styled-components';
 import { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 import { auth } from '../firebase.ts';
-import { useNavigate } from 'react-router-dom';
-
-const Wrapper = styled.div`
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 420px;
-	padding: 50px 0;
-`;
-const Form = styled.form`
-	margin-top: 50px;
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	width: 100%;
-`;
-const Title = styled.h1`
-	font-size: 42px;
-`;
-const Input = styled.input`
-	padding: 10px 20px;
-	border-radius: 50px;
-	border: none;
-	width: 100%;
-	font-size: 16px;
-
-	&[type='submit'] {
-		cursor: pointer;
-
-		&:hover {
-			opacity: 0.8;
-		}
-	}
-`;
-const Error = styled.span`
-	font-weight: 600;
-	color: tomato;
-`;
+import { Link, useNavigate } from 'react-router-dom';
+import {
+	Form,
+	Input,
+	Switcher,
+	Title,
+	Wrapper,
+	Error,
+} from '../components/auth-component';
+import GithubBtn from '../components/github-btn';
+import { CreateUserData } from '../definition/user';
 
 export default function CreateAccount() {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const [name, setName] = useState<string>('');
-	const [email, setEmail] = useState<string>('');
-	const [password, setPassword] = useState<string>('');
+	const [userData, setUserData] = useState<CreateUserData>({
+		name: '',
+		email: '',
+		password: '',
+	});
 	const [error, setError] = useState<string>('');
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const {
 			target: { name, value },
 		} = e;
-		if (name === 'name') {
-			setName(value);
-		} else if (name === 'email') {
-			setEmail(value);
-		} else {
-			setPassword(value);
-		}
+		setUserData((prev) => {
+			return { ...prev, [name]: value };
+		});
 	};
 	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (isLoading || name === '' || email === '' || password === '') return;
+		setError('');
+		if (
+			isLoading ||
+			userData.name === '' ||
+			userData.email === '' ||
+			userData.password === ''
+		)
+			return;
 		try {
 			setIsLoading(true);
 			const credentials = await createUserWithEmailAndPassword(
 				auth,
-				email,
-				password,
+				userData.email,
+				userData.password,
 			);
-			console.log(credentials.user);
 			await updateProfile(credentials.user, {
-				displayName: name,
+				displayName: userData.name,
 			});
 			navigate('/');
 		} catch (e) {
-			// setError
+			if (e instanceof FirebaseError) {
+				setError(e.message);
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -90,7 +68,7 @@ export default function CreateAccount() {
 				<Input
 					onChange={onChange}
 					name="name"
-					value={name}
+					value={userData.name}
 					placeholder="Name"
 					type="text"
 					required
@@ -98,7 +76,7 @@ export default function CreateAccount() {
 				<Input
 					onChange={onChange}
 					name="email"
-					value={email}
+					value={userData.email}
 					placeholder="Email"
 					type="email"
 					required
@@ -106,7 +84,7 @@ export default function CreateAccount() {
 				<Input
 					onChange={onChange}
 					name="password"
-					value={password}
+					value={userData.password}
 					placeholder="Password"
 					type="password"
 					required
@@ -117,6 +95,10 @@ export default function CreateAccount() {
 				/>
 			</Form>
 			{error !== '' ? <Error>{error}</Error> : null}
+			<Switcher>
+				Already have an account? <Link to={'/login'}>Login &rarr;</Link>
+			</Switcher>
+			<GithubBtn />
 		</Wrapper>
 	);
 }
