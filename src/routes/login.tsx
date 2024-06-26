@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FirebaseError } from 'firebase/app';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase.ts';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -10,6 +11,7 @@ import {
 	Title,
 	Wrapper,
 	Error,
+	ResetPassword,
 } from '../components/auth-component.ts';
 import GithubBtn from '../components/github-btn';
 import LoginUserData from '../definition/user';
@@ -46,6 +48,11 @@ export default function CreateAccount() {
 			setIsLoading(false);
 		}
 	};
+	const tryResetPassword = () => {
+		sendPasswordResetEmail(auth, userData.email).then(() => {
+			alert('Success to send email, check your mailbox');
+		});
+	};
 
 	return (
 		<Wrapper>
@@ -74,6 +81,9 @@ export default function CreateAccount() {
 				Don't have an account yet?{' '}
 				<Link to={'/create-account'}>Create one &rarr;</Link>
 			</Switcher>
+			<ResetPassword onClick={tryResetPassword}>
+				Don't remember your password?{' '}
+			</ResetPassword>
 			<GithubBtn />
 		</Wrapper>
 	);

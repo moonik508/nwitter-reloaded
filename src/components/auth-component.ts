@@ -46,3 +46,10 @@ export const Switcher = styled.span`
 		color: #1d9bf0;
 	}
 `;
+
+export const ResetPassword = styled.span`
+	margin-top: 20px;
+	font-size: 14px;
+	color: #1d9bf0;
+	cursor: pointer;
+`;
