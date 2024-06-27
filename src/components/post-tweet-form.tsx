@@ -46,7 +46,7 @@ const AttachFileButton = styled.label`
 	cursor: pointer;
 `;
 
-const AttachFileInput = styled.input`
+export const AttachFileInput = styled.input`
 	display: none;
 `;
 
