@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "local": "vite",
+    "dev" : "vite --mode=dev",
+    "stg" : "vite --mode=stg",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
